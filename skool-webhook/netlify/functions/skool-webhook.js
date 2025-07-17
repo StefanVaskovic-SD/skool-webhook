@@ -2,6 +2,11 @@ const admin = require('firebase-admin');
 
 // Inicijalizuj Firebase Admin samo jednom
 if (!admin.apps.length) {
+  console.log('🔥 Inicijalizujem Firebase...');
+  console.log('Project ID:', process.env.FIREBASE_PROJECT_ID);
+  console.log('Client Email:', process.env.FIREBASE_CLIENT_EMAIL);
+  console.log('Private Key length:', process.env.FIREBASE_PRIVATE_KEY ? process.env.FIREBASE_PRIVATE_KEY.length : 'undefined');
+  
   admin.initializeApp({
     credential: admin.credential.cert({
       projectId: process.env.FIREBASE_PROJECT_ID,
@@ -10,6 +15,7 @@ if (!admin.apps.length) {
     }),
     databaseURL: "https://podclub-bdcc9-default-rtdb.firebaseio.com"
   });
+  console.log('✅ Firebase inicijalizovan');
 }
 
 exports.handler = async (event, context) => {
@@ -53,20 +59,31 @@ exports.handler = async (event, context) => {
       memberData = JSON.parse(event.body);
     }
 
-    console.log('📧 Processing member:', memberData);
+    console.log('📧 RAW received data:', JSON.stringify(memberData, null, 2));
+    console.log('📧 Available fields:', Object.keys(memberData));
+
+    // Try different email field names
+    const email = memberData.email || memberData.Email || memberData.member_email || memberData.user_email;
+    
+    console.log('📧 Extracted email:', email);
 
     // Basic validation
-    if (!memberData.email) {
+    if (!email) {
       return {
         statusCode: 400,
         headers,
         body: JSON.stringify({
           success: false,
           error: 'Email is required',
+          received_data: memberData,
+          available_fields: Object.keys(memberData),
           timestamp: new Date().toISOString()
         })
       };
     }
+
+    // Update memberData with extracted email
+    memberData.email = email;
 
     // Sinhronizuj sa Firebase
     const result = await syncSkoolMemberToFirebase(memberData);
