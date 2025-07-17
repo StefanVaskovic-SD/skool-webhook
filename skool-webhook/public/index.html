@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skool Webhook</title>
+</head>
+<body>
+    <h1>Skool Webhook Service</h1>
+    <p>This site demonstrates a simple webhook for Skool integration.</p>
+    
+    <h2>Available Functions:</h2>
+    <ul>
+        <li><a href="/.netlify/functions/skool-webhook">Skool Webhook</a> - POST endpoint</li>
+        <li><a href="/api/skool-webhook">Skool Webhook (via redirect)</a> - shorter URL</li>
+    </ul>
+
+    <h2>Test the webhook:</h2>
+    <button onclick="testWebhook()">Test POST Request</button>
+    <div id="result"></div>
+
+    <script>
+        async function testWebhook() {
+            try {
+                const response = await fetch('/api/skool-webhook', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        email: 'test@example.com', 
+                        name: 'Test User',
+                        id: 'test123'
+                    })
+                });
+                const data = await response.json();
+                document.getElementById('result').innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+            } catch (error) {
+                document.getElementById('result').innerHTML = 'Error: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>

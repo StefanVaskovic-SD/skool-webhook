@@ -1,0 +1,15 @@
+{
+  "name": "skool-webhook",
+  "version": "1.0.0",
+  "description": "Netlify Functions webhook for Skool integration",
+  "main": "index.js",
+  "scripts": {
+    "dev": "netlify dev"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.0.0"
+  },
+  "devDependencies": {
+    "netlify-cli": "^15.0.0"
+  }
+}
